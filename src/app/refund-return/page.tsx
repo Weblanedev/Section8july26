@@ -6,6 +6,7 @@ import PolicyLayout, {
   PolicySubheading,
 } from "@/components/PolicyLayout";
 import { createPageMetadata } from "@/lib/metadata";
+import { companyContact } from "@/lib/site";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Refund & Return Policy",
@@ -18,7 +19,7 @@ export default function RefundReturnPage() {
     <PolicyLayout title="Refund & Return Policy">
       <p>
         <strong className="text-primary">Last Updated:</strong>{" "}
-        {new Date().toLocaleDateString()}
+        {companyContact.policyLastUpdated}
       </p>
 
       <PolicySection title="Return Policy">
@@ -31,9 +32,9 @@ export default function RefundReturnPage() {
         <PolicySubheading>Conditions for Returns</PolicySubheading>
         <PolicyList>
           <li>
-            Items must be unused, unworn, and in their original packaging
+            Items must be unused, unopened, and in their original packaging
           </li>
-          <li>Items must have all tags and labels attached</li>
+          <li>Items must include all accessories, manuals, and seals where applicable</li>
           <li>Items must be in the same condition as when received</li>
           <li>Proof of purchase (order number or receipt) is required</li>
           <li>Returns must be initiated within 30 days of delivery</li>
@@ -42,7 +43,7 @@ export default function RefundReturnPage() {
         <PolicySubheading>Items Not Eligible for Return</PolicySubheading>
         <PolicyList>
           <li>Items that have been used, worn, or damaged</li>
-          <li>Items without original packaging or tags</li>
+          <li>Items without original packaging or missing accessories</li>
           <li>Personalized or customized items</li>
           <li>Items purchased more than 30 days ago</li>
           <li>Gift cards and promotional items</li>
@@ -53,10 +54,10 @@ export default function RefundReturnPage() {
         <PolicyList ordered>
           <li>
             Contact our customer service team at{" "}
-            <PolicyLink href="mailto:returns@section8.com">
-              returns@section8.com
+            <PolicyLink href={`mailto:${companyContact.email}`}>
+              {companyContact.email}
             </PolicyLink>{" "}
-            or call +234 800 000 0000 to initiate a return
+            or call {companyContact.phoneDisplay} to initiate a return
           </li>
           <li>Provide your order number and reason for return</li>
           <li>
@@ -147,16 +148,17 @@ export default function RefundReturnPage() {
         <ul className="space-y-2">
           <li>
             <strong className="text-primary">Email:</strong>{" "}
-            <PolicyLink href="mailto:returns@section8.com">
-              returns@section8.com
+            <PolicyLink href={`mailto:${companyContact.email}`}>
+              {companyContact.email}
             </PolicyLink>
           </li>
           <li>
-            <strong className="text-primary">Phone:</strong> +234 800 000 0000
+            <strong className="text-primary">Phone:</strong>{" "}
+            {companyContact.phoneDisplay}
           </li>
           <li>
-            <strong className="text-primary">Hours:</strong> Monday - Friday,
-            9AM - 6PM WAT
+            <strong className="text-primary">Hours:</strong>{" "}
+            {companyContact.supportHours}
           </li>
         </ul>
       </PolicySection>

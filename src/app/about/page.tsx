@@ -129,9 +129,9 @@ export default function AboutPage() {
                 meticulous attention to detail.
               </p>
               <p>
-                We work directly with manufacturers and artisans to bring you
-                the best quality at fair prices, ensuring that quality meets
-                style in every purchase.
+                We work with trusted suppliers and brands to bring you reliable
+                products at fair prices, ensuring that quality meets value in every
+                purchase.
               </p>
             </div>
           </div>

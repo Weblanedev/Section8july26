@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { companyContact } from "@/lib/site";
 
 const contactDetails = [
   {
     title: "Email",
-    value: "operations@sectioneight.ng",
-    href: "mailto:operations@sectioneight.ng",
+    value: companyContact.email,
+    href: `mailto:${companyContact.email}`,
     icon: (
       <path
         strokeLinecap="round"
@@ -18,8 +19,8 @@ const contactDetails = [
   },
   {
     title: "Phone",
-    value: "+234 (0) 9096 3615 27",
-    href: "tel:+2349096361527",
+    value: companyContact.phoneDisplay,
+    href: `tel:${companyContact.phoneTel}`,
     icon: (
       <path
         strokeLinecap="round"
@@ -46,11 +47,7 @@ const contactDetails = [
         />
       </>
     ),
-    lines: [
-      "12, Thomas Olaniyan Street,",
-      "Anthony Village, Lagos State,",
-      "Nigeria",
-    ],
+    lines: companyContact.addressLines,
   },
 ];
 

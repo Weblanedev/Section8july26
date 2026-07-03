@@ -5,6 +5,7 @@ import PolicyLayout, {
   PolicySubheading,
 } from "@/components/PolicyLayout";
 import { createPageMetadata } from "@/lib/metadata";
+import { companyContact, siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Privacy Policy",
@@ -17,17 +18,19 @@ export default function PrivacyPage() {
     <PolicyLayout title="Privacy Policy">
       <p>
         <strong className="text-primary">Last Updated:</strong>{" "}
-        {new Date().toLocaleDateString()}
+        {companyContact.policyLastUpdated}
       </p>
 
       <PolicySection title="1. Introduction">
         <p>
-          appliance store (NEC) or household appliances stores (&quot;we,&quot;
-          &quot;our,&quot; or &quot;us&quot;). We are committed to protecting
-          your privacy and ensuring you have a positive experience on our
-          website and in using our products and services. This Privacy Policy
-          explains how we collect, use, disclose, and safeguard your information
-          when you visit our website and purchase our products.
+          Welcome to {siteConfig.name} (&quot;we,&quot; &quot;our,&quot; or
+          &quot;us&quot;). We operate a modern tech marketplace in Nigeria,
+          offering phones, laptops, accessories, gaming gear, and related
+          electronics. We are committed to protecting your privacy and ensuring
+          you have a positive experience on our website and when using our
+          products and services. This Privacy Policy explains how we collect,
+          use, disclose, and safeguard your information when you visit our
+          website and purchase our products.
         </p>
       </PolicySection>
 
@@ -151,14 +154,16 @@ export default function PrivacyPage() {
         </p>
         <ul className="space-y-2">
           <li>
-            <strong className="text-primary">Email:</strong> privacy@section8.com
+            <strong className="text-primary">Email:</strong>{" "}
+            {companyContact.email}
           </li>
           <li>
-            <strong className="text-primary">Phone:</strong> +234 800 000 0000
+            <strong className="text-primary">Phone:</strong>{" "}
+            {companyContact.phoneDisplay}
           </li>
           <li>
-            <strong className="text-primary">Address:</strong> Section Eight,
-            Nigeria
+            <strong className="text-primary">Address:</strong>{" "}
+            {companyContact.addressShort}
           </li>
         </ul>
       </PolicySection>

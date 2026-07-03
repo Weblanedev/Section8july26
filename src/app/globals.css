@@ -61,6 +61,10 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     @apply rounded-full bg-muted/40;
   }
+
+  .spinner-ring {
+    animation: spin 0.9s linear infinite;
+  }
 }
 
 /* Signed-in shell - distinct feel */
