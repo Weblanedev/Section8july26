@@ -13,7 +13,6 @@ import { recordOrderForUser, recordTransactionForUser } from "@/hooks/useUserAcc
 import ProductImage from "@/components/ui/ProductImage";
 import { Spinner, SpinnerOverlay } from "@/components/ui/Spinner";
 import CheckoutSkeleton from "@/components/skeletons/CheckoutSkeleton";
-import { useMinSkeletonTime } from "@/hooks/useMinSkeletonTime";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -21,7 +20,6 @@ export default function CheckoutPage() {
   const { isAuthenticated, user } = useAuthStore();
   const hydrated = usePersistHydration();
   const [loading, setLoading] = useState(false);
-  const isSkeletonLoading = useMinSkeletonTime();
   const [delivery, setDelivery] = useState({
     address: "",
     city: "",
@@ -35,7 +33,7 @@ export default function CheckoutPage() {
     }
   }, [hydrated, isAuthenticated, router]);
 
-  if (!hydrated || !isAuthenticated || isSkeletonLoading) return <CheckoutSkeleton />;
+  if (!hydrated || !isAuthenticated) return <CheckoutSkeleton />;
 
   const total = getTotalPrice();
 

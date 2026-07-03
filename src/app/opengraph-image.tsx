@@ -56,7 +56,7 @@ export default function OgImage() {
             color: "#94A3B8",
           }}
         >
-          Nigeria&apos;s smartest tech marketplace - phones, laptops, accessories and more.
+          Nigeria&apos;s smartest tech products marketplace - phones, laptops, accessories and more.
         </p>
         <div
           style={{

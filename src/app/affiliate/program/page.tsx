@@ -10,7 +10,6 @@ import { getAffiliatePackage } from "@/data/affiliate";
 import { AffiliateMode } from "@/types";
 import { usePersistHydration } from "@/hooks/usePersistHydration";
 import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
-import { useMinSkeletonTime } from "@/hooks/useMinSkeletonTime";
 
 export default function AffiliateProgramPage() {
   const router = useRouter();
@@ -26,7 +25,6 @@ export default function AffiliateProgramPage() {
     description: "",
     category: "accessories",
   });
-  const isSkeletonLoading = useMinSkeletonTime();
 
   useEffect(() => {
     if (!hydrated) return;
@@ -39,7 +37,7 @@ export default function AffiliateProgramPage() {
     }
   }, [hydrated, isAuthenticated, isSubscribed, router]);
 
-  if (!hydrated || !isAuthenticated || !isSubscribed || !profile || isSkeletonLoading) {
+  if (!hydrated || !isAuthenticated || !isSubscribed || !profile) {
     return <DashboardSkeleton />;
   }
 
@@ -77,7 +75,7 @@ export default function AffiliateProgramPage() {
     {
       id: "list",
       title: "List Your Products",
-      desc: "Submit your tech products for us to review and list on Section Eight.",
+      desc: "Submit your tech products for us to review and list on Section Eight. Get featured store pages.",
       icon: "📦",
     },
   ];
@@ -143,7 +141,7 @@ export default function AffiliateProgramPage() {
             <h2 className="font-bold mb-4">Quick Share</h2>
             <div className="flex flex-wrap gap-3">
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`Shop tech at Section Eight! ${referralLink}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`Shop tech products at Section Eight! ${referralLink}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-secondary text-sm"

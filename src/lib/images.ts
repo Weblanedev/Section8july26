@@ -49,11 +49,9 @@ export const UNSPLASH_POOL = [
   "photo-1587829741301-dc798b83add3",
   "photo-1590658268037-6bf12165a8df",
   "photo-1609091839311-d5365f9ff1c5",
-  "photo-1558618666-fcd25c85cd64",
   "photo-1633356122544-f134324a6cee",
   "photo-1526170375885-4d8ecf77b99f",
   "photo-1572569511254-d8f925fe2cbb",
-  "photo-1597872200969-2b65d56bd16b",
   "photo-1527443224154-c4a3942d3acf",
   "photo-1625842268584-8f3296236761",
   "photo-1505740420928-5e560c06d30e",
@@ -68,6 +66,9 @@ export const UNSPLASH_POOL = [
   "photo-1503602642458-232111445657",
   "photo-1550751827-4bd374c3f58b",
   "photo-1608043152269-423dbba4e7e1",
+  "photo-1493946947703-a0e68b050bee",
+  "photo-1756836857559-4c8161fe07f3",
+  "photo-1553062407-98eeb64c6a62",
 ] as const;
 
 const usedPhotos = new Set<string>();

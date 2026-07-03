@@ -28,15 +28,29 @@ const BASE_PHOTO_MAP: Record<string, string> = {
   "usb-keyboard": "photo-1587829741301-dc798b83add3",
   "bluetooth-earbuds": "photo-1590658268037-6bf12165a8df",
   "power-bank-20k": "photo-1609091839311-d5365f9ff1c5",
-  "hdmi-cable": "photo-1558618666-fcd25c85cd64",
-  "usb-hub": "photo-1597872200969-2b65d56bd16b",
+  "hdmi-cable": "photo-1544197150-b99a580bb7a8",
+  "usb-hub": "photo-1484788984921-03950022c9ef",
   "webcam-hd": "photo-1531297484001-80022131f5a1",
   "gaming-pad": "photo-1572569511254-d8f925fe2cbb",
-  "ssd-256": "photo-1597872200969-2b65d56bd16b",
+  "ssd-256": "photo-1756836857559-4c8161fe07f3",
   "monitor-24": "photo-1527443224154-c4a3942d3acf",
   "router-wifi6": "photo-1633356122544-f134324a6cee",
-  macbookcharger: "photo-1558618666-fcd25c85cd64",
+  macbookcharger: "photo-1484788984921-03950022c9ef",
   gamepadpro: "photo-1512941937669-90a1b58e7e9c",
+};
+
+/** Extra catalog items that must not share a generic pool */
+const EXTRA_PHOTO_MAP: Record<string, string> = {
+  "usb-flash-128gb": "photo-1477949331575-2763034b5fb5",
+  "usb-flash-1tb": "photo-1493946947703-a0e68b050bee",
+  "sandisk-128gb-usb": "photo-1477949331575-2763034b5fb5",
+  "seagate-1tb-hdd": "photo-1739742473151-d73df9c2a7b9",
+  "sandisk-64gb-sd": "photo-1550751827-4bd374c3f58b",
+  "laptop-bag-15": "photo-1553062407-98eeb64c6a62",
+  "usb-c-hub-4in1": "photo-1484788984921-03950022c9ef",
+  "kaspersky-standard": "photo-1550751827-4bd374c3f58b",
+  "norton-360-premium": "photo-1550751827-4bd374c3f58b",
+  "apple-magic-keyboard": "photo-1618384887929-16ec33fab9ef",
 };
 
 const PHONE_PHOTOS = [
@@ -87,17 +101,49 @@ const GAMING_PHOTOS = [
 ] as const;
 
 const ACCESSORY_PHOTOS = [
-  "photo-1597872200969-2b65d56bd16b",
-  "photo-1558618666-fcd25c85cd64",
+  "photo-1493946947703-a0e68b050bee",
+  "photo-1477949331575-2763034b5fb5",
+  "photo-1756836857559-4c8161fe07f3",
+  "photo-1739742473151-d73df9c2a7b9",
+  "photo-1609091839311-d5365f9ff1c5",
+  "photo-1544197150-b99a580bb7a8",
+  "photo-1484788984921-03950022c9ef",
+  "photo-1553062407-98eeb64c6a62",
+] as const;
+
+const USB_FLASH_PHOTOS = [
+  "photo-1493946947703-a0e68b050bee",
+  "photo-1477949331575-2763034b5fb5",
+] as const;
+
+const STORAGE_PHOTOS = [
+  "photo-1756836857559-4c8161fe07f3",
+  "photo-1739742473151-d73df9c2a7b9",
+] as const;
+
+const CABLE_PHOTOS = [
+  "photo-1544197150-b99a580bb7a8",
+  "photo-1550751827-4bd374c3f58b",
+] as const;
+
+const CHARGER_PHOTOS = [
   "photo-1609091839311-d5365f9ff1c5",
   "photo-1484788984921-03950022c9ef",
+] as const;
+
+const BAG_PHOTOS = [
+  "photo-1553062407-98eeb64c6a62",
+] as const;
+
+const HUB_PHOTOS = [
+  "photo-1484788984921-03950022c9ef",
+  "photo-1544197150-b99a580bb7a8",
 ] as const;
 
 const OFFICE_PHOTOS = [
   "photo-1633356122544-f134324a6cee",
   "photo-1527864550417-7fd91fc51a46",
   "photo-1587829741301-dc798b83add3",
-  "photo-1558618666-fcd25c85cd64",
   "photo-1503602642458-232111445657",
 ] as const;
 
@@ -111,6 +157,12 @@ const POOLS = {
   gaming: GAMING_PHOTOS,
   accessory: ACCESSORY_PHOTOS,
   office: OFFICE_PHOTOS,
+  usbFlash: USB_FLASH_PHOTOS,
+  storage: STORAGE_PHOTOS,
+  cable: CABLE_PHOTOS,
+  charger: CHARGER_PHOTOS,
+  bag: BAG_PHOTOS,
+  hub: HUB_PHOTOS,
 } as const;
 
 type PoolKey = keyof typeof POOLS;
@@ -136,7 +188,13 @@ function resolvePoolKey(productId: string, category: ProductCategory): PoolKey {
   if (/mouse|mousepad|mouse-pad|mice/.test(id)) return "mouse";
   if (/keyboard/.test(id)) return "keyboard";
   if (/monitor|display|webcam|camera|aio/.test(id)) return "monitor";
-  if (/router|wifi|repeater|hub/.test(id)) return "office";
+  if (/router|wifi|repeater/.test(id)) return "office";
+  if (/hub|otg|adapter/.test(id)) return "hub";
+  if (/bag|backpack/.test(id)) return "bag";
+  if (/flash|sandisk|cruzer|usb-flash/.test(id)) return "usbFlash";
+  if (/ssd|hdd|seagate|storage|nand/.test(id)) return "storage";
+  if (/cable|hdmi/.test(id)) return "cable";
+  if (/charger|charging|power-bank|powerbank/.test(id)) return "charger";
   if (/headset|headphone|earbud|airpod|speaker|audio|jbl|sony|logitech-h/.test(id)) {
     return "audio";
   }
@@ -155,12 +213,7 @@ function resolvePoolKey(productId: string, category: ProductCategory): PoolKey {
   ) {
     return "phone";
   }
-  if (/usb|flash|ssd|hdd|sandisk|seagate|power-bank|charger|cable/.test(id)) {
-    return "accessory";
-  }
-  if (/printer|thermal|stand|cooling|bag|backpack|kaspersky|norton/.test(id)) {
-    return "office";
-  }
+  if (/usb/.test(id)) return "usbFlash";
 
   const byCategory: Record<ProductCategory, PoolKey> = {
     phones: "phone",
@@ -179,7 +232,7 @@ export function getProductPhotoUrl(
   productId: string,
   category: ProductCategory = "accessories"
 ): string {
-  const explicit = BASE_PHOTO_MAP[productId];
+  const explicit = BASE_PHOTO_MAP[productId] ?? EXTRA_PHOTO_MAP[productId];
   if (explicit) return unsplashPhoto(explicit);
 
   const poolKey = resolvePoolKey(productId, category);

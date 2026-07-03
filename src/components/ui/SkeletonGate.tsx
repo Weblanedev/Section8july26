@@ -1,21 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useMinSkeletonTime } from "@/hooks/useMinSkeletonTime";
 
 interface SkeletonGateProps {
-  skeleton: ReactNode;
+  skeleton?: ReactNode;
   children: ReactNode;
-  durationMs?: number;
 }
 
-export default function SkeletonGate({
-  skeleton,
-  children,
-  durationMs,
-}: SkeletonGateProps) {
-  const isLoading = useMinSkeletonTime(durationMs);
-
-  if (isLoading) return <>{skeleton}</>;
+/** Renders children immediately. Route loading.tsx + ProductImage handle real loading states. */
+export default function SkeletonGate({ children }: SkeletonGateProps) {
   return <>{children}</>;
 }

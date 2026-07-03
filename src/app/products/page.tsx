@@ -13,9 +13,7 @@ import {
   productsData,
   categoryLabels,
   getTopDeals,
-  getLimitedStockDeals,
-  getProductsByCategory,
-  getProductCount,
+  getHotDeals,
 } from "@/data/products";
 import { categoryNav } from "@/data/marketplace";
 
@@ -74,9 +72,6 @@ function ProductsContent() {
               >
                 📞 Call to Order
               </a>
-              <span className="text-sm text-muted">
-                ({filtered.length} of {getProductCount()} products)
-              </span>
             </div>
           </div>
         </div>
@@ -87,9 +82,9 @@ function ProductsContent() {
           <FlashSaleBar />
           <PromoStrip />
           <ProductScroller
-            title="Limited Stock Deals"
-            subtitle="Selling fast - don't miss out"
-            products={getLimitedStockDeals(12)}
+            title="Hot Deals"
+            subtitle="Biggest discounts right now"
+            products={getHotDeals(12)}
             seeAllHref="/products?sort=deals"
           />
           <ProductScroller
@@ -192,9 +187,6 @@ function ProductsContent() {
                         {cat === "laptops" ? "💻" : cat === "phones" ? "📱" : cat === "office" ? "🖱️" : "🎮"}
                       </span>
                       <p className="text-sm font-semibold">{categoryLabels[cat]}</p>
-                      <p className="text-xs text-muted mt-0.5">
-                        {getProductsByCategory(cat, 100).length} items
-                      </p>
                     </Link>
                   ))}
                 </div>
@@ -228,9 +220,9 @@ function ProductsContent() {
       {showMarketplaceSections && (
         <section className="border-t border-surface-light/30 bg-surface/20 py-12 px-4">
           <div className="mx-auto max-w-4xl prose prose-invert prose-sm">
-            <h2 className="text-xl font-bold text-primary">Buy Tech Online in Nigeria</h2>
+            <h2 className="text-xl font-bold text-primary">Buy Tech Products Online in Nigeria</h2>
             <p className="text-muted leading-relaxed mt-3">
-              Section Eight is Nigeria&apos;s modern tech marketplace - phones, laptops, gaming gear,
+              Section Eight is Nigeria&apos;s modern tech products marketplace - phones, laptops, gaming gear,
               office accessories and budget gadgets. Shop with secure checkout, nationwide delivery,
               and deals updated daily. From ₦5,000 accessories to premium MacBooks, find everything
               you need in one place.

@@ -10,16 +10,15 @@ import ProductScroller from "@/components/marketplace/ProductScroller";
 import CategoryBanners from "@/components/marketplace/CategoryBanners";
 import { affiliatePackages } from "@/data/affiliate";
 import {
-  getLimitedStockDeals,
+  getHotDeals,
   getTopDeals,
   getProductsByCategory,
   getFeaturedProducts,
-  getProductCount,
 } from "@/data/products";
 import { formatNaira } from "@/lib/format";
 
 function HomeContent() {
-  const limitedDeals = getLimitedStockDeals(12);
+  const hotDeals = getHotDeals(12);
   const topDeals = getTopDeals(12);
   const laptops = getProductsByCategory("laptops", 12);
   const office = getProductsByCategory("office", 12);
@@ -38,7 +37,7 @@ function HomeContent() {
         <div className="flex animate-marquee whitespace-nowrap gap-12 text-sm font-semibold text-muted">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex gap-12">
-              <span>🚀 {getProductCount()}+ Products</span>
+              <span>🚀 Wide Tech Selection</span>
               <span>💰 From ₦5,000</span>
               <span>🔒 Secure Checkout</span>
               <span>📦 Nationwide Delivery</span>
@@ -51,9 +50,9 @@ function HomeContent() {
       </section>
 
       <ProductScroller
-        title="Limited Stock Deals"
-        subtitle="Grab them before they're gone"
-        products={limitedDeals}
+        title="Hot Deals"
+        subtitle="Biggest discounts right now"
+        products={hotDeals}
         seeAllHref="/products?sort=deals"
       />
 
@@ -129,7 +128,7 @@ function HomeContent() {
       />
 
       <ProductScroller
-        title="Budget Tech Store"
+        title="Budget Tech Products Store"
         subtitle="Quality gadgets from ₦5,000"
         products={budget}
         seeAllHref="/products?category=budget"

@@ -6,22 +6,27 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { useUserAccount } from "@/hooks/useUserAccount";
+import { usePersistHydration } from "@/hooks/usePersistHydration";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const hydrated = usePersistHydration();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems, openCart } = useCartStore();
   const { isSubscribed } = useUserAccount();
   const totalItems = getTotalItems();
+
+  const showSignedIn = hydrated && isAuthenticated;
+  const showCartBadge = hydrated && totalItems > 0;
 
   const links = [
     { href: "/", label: "Home" },
     { href: "/products", label: "Shop" },
     { href: "/affiliate", label: "Affiliate" },
     { href: "/about", label: "About" },
-    ...(isAuthenticated
+    ...(showSignedIn
       ? [
           { href: "/dashboard", label: "Dashboard" },
           ...(isSubscribed ? [{ href: "/affiliate/program", label: "My Affiliate" }] : []),
@@ -47,7 +52,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl">
+        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl" suppressHydrationWarning>
           <input
             type="text"
             value={search}
@@ -64,7 +69,7 @@ export default function Navbar() {
         </form>
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          {isAuthenticated && user && (
+          {showSignedIn && user && (
             <span className="signed-in-badge hidden lg:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
               {user.name.split(" ")[0]}
@@ -75,14 +80,14 @@ export default function Navbar() {
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
-            {totalItems > 0 && (
+            {showCartBadge && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-marketplace text-xs font-bold text-white">
                 {totalItems}
               </span>
             )}
           </button>
 
-          {isAuthenticated ? (
+          {showSignedIn ? (
             <button onClick={logout} className="btn-ghost text-sm hidden sm:inline-flex">
               Sign out
             </button>

@@ -31,7 +31,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="font-bold text-lg">Section Eight</p>
-                <p className="text-sm text-muted">Nigeria&apos;s tech marketplace</p>
+                <p className="text-sm text-muted">Nigeria&apos;s tech products marketplace</p>
               </div>
             </div>
 

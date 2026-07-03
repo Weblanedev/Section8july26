@@ -1,6 +1,6 @@
 # Section Eight - Modern Tech Marketplace
 
-A Next.js e-commerce app for Nigerian tech products with KoraPay payments and an affiliate program.
+A Next.js e-commerce app for Nigerian tech products with secure payments and an affiliate program.
 
 ## Stack
 
@@ -36,7 +36,7 @@ See [KoraPay Checkout docs](https://developers.korapay.com/docs/checkout-redirec
 
 ## Features
 
-- Browse 24+ products (premium + budget tech from ₦5,000)
+- Browse 24+ products (premium + budget tech products from at affordable prices)
 - Cart with persistent storage and Pay Now drawer
 - Sign up / Sign in (local storage, no backend DB)
 - Checkout via KoraPay (card, bank transfer, pay-with-bank)

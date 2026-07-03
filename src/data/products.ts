@@ -7,7 +7,7 @@ const baseProducts: Product[] = [
   {
     id: "iphone17",
     name: "iPhone 17",
-    description: "The latest iPhone with cutting-edge technology.",
+    description: "The latest iPhone with cutting-edge tech products.",
     detailedDescription:
       "A18 Pro chip, advanced camera system, 6.7-inch Super Retina XDR display, Ceramic Shield, 5G, Face ID, iOS 18.",
     price: 2500000,
@@ -338,18 +338,17 @@ export function getTopDeals(limit = 12): Product[] {
     .slice(0, limit);
 }
 
-export function getLimitedStockDeals(limit = 12): Product[] {
+export function getHotDeals(limit = 12): Product[] {
   return [...productsData]
     .filter((p) => p.discount && p.discount >= 30)
     .sort((a, b) => a.price - b.price)
     .slice(0, limit);
 }
 
+/** @deprecated Use getHotDeals */
+export const getLimitedStockDeals = getHotDeals;
+
 export function getProductsByCategory(category: string, limit = 12): Product[] {
   if (category === "all") return productsData.slice(0, limit);
   return productsData.filter((p) => p.category === category).slice(0, limit);
-}
-
-export function getProductCount(): number {
-  return productsData.length;
 }

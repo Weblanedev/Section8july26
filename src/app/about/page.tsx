@@ -4,7 +4,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata: Metadata = createPageMetadata({
   title: "About Us",
   description:
-    "Learn about Section Eight - Nigeria's modern tech marketplace for phones, laptops and accessories.",
+    "Learn about Section Eight - Nigeria's modern tech products marketplace for phones, laptops and accessories.",
   path: "/about",
 });
 

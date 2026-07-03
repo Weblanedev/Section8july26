@@ -24,7 +24,7 @@ export default function PrivacyPage() {
       <PolicySection title="1. Introduction">
         <p>
           Welcome to {siteConfig.name} (&quot;we,&quot; &quot;our,&quot; or
-          &quot;us&quot;). We operate a modern tech marketplace in Nigeria,
+          &quot;us&quot;). We operate a modern tech products marketplace in Nigeria,
           offering phones, laptops, accessories, gaming gear, and related
           electronics. We are committed to protecting your privacy and ensuring
           you have a positive experience on our website and when using our
