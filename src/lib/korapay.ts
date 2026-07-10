@@ -2,6 +2,14 @@ import { generateReference } from "@/lib/format";
 
 const KORAPAY_API = "https://api.korapay.com/merchant/api/v1";
 
+function getSecretKey(): string {
+  const secretKey = process.env.KORAPAY_SECRET_KEY?.trim();
+  if (!secretKey) {
+    throw new Error("Payment is not configured. Missing KORAPAY_SECRET_KEY.");
+  }
+  return secretKey;
+}
+
 export interface InitializePaymentParams {
   amount: number;
   currency?: string;
@@ -21,17 +29,7 @@ export interface InitializePaymentResult {
 export async function initializeKoraPayment(
   params: InitializePaymentParams
 ): Promise<InitializePaymentResult> {
-  const secretKey = process.env.KORAPAY_SECRET_KEY;
-
-  if (!secretKey || secretKey.includes("your_secret_key")) {
-    // Demo mode - return mock checkout for development
-    const reference = params.reference || generateReference();
-    return {
-      reference,
-      checkoutUrl: `${params.redirectUrl}?reference=${reference}&demo=true`,
-    };
-  }
-
+  const secretKey = getSecretKey();
   const reference = params.reference || generateReference();
 
   const response = await fetch(`${KORAPAY_API}/charges/initialize`, {
@@ -68,19 +66,17 @@ export async function initializeKoraPayment(
 }
 
 export async function verifyKoraPayment(reference: string) {
-  const secretKey = process.env.KORAPAY_SECRET_KEY;
+  const secretKey = getSecretKey();
 
-  if (!secretKey || secretKey.includes("your_secret_key")) {
-    return { status: "success", reference, demo: true };
-  }
-
-  const response = await fetch(
-    `${KORAPAY_API}/charges/${reference}`,
-    {
-      headers: { Authorization: `Bearer ${secretKey}` },
-    }
-  );
+  const response = await fetch(`${KORAPAY_API}/charges/${reference}`, {
+    headers: { Authorization: `Bearer ${secretKey}` },
+  });
 
   const data = await response.json();
+
+  if (!response.ok || !data.status) {
+    throw new Error(data.message || "Payment verification failed");
+  }
+
   return data.data;
 }

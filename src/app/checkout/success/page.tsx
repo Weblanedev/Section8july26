@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
-  const demo = searchParams.get("demo");
   const clearCart = useCartStore((s) => s.clearCart);
   const userId = useAuthStore((s) => s.user?.id);
   const [verified, setVerified] = useState(false);
@@ -21,10 +20,10 @@ function SuccessContent() {
   useEffect(() => {
     if (!reference) return;
 
-    fetch(`/api/payment/verify?reference=${reference}${demo ? "&demo=true" : ""}`)
+    fetch(`/api/payment/verify?reference=${reference}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.status === "success" || data.demo) {
+        if (data.status === "success") {
           const pending = popPendingOrder();
           if (pending && userId) {
             recordOrderForUser(userId, pending);
@@ -42,7 +41,7 @@ function SuccessContent() {
           clearCart();
         }
       });
-  }, [reference, demo, clearCart, userId]);
+  }, [reference, clearCart, userId]);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-24 text-center">
@@ -69,7 +68,6 @@ function SuccessContent() {
         {reference && (
           <p className="text-xs text-muted mb-6">
             Reference: <code className="text-accent">{reference}</code>
-            {demo && " (demo mode)"}
           </p>
         )}
         <div className="flex gap-3 justify-center">

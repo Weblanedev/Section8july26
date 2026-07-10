@@ -58,11 +58,8 @@ function AffiliateContent() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
-      if (data.checkoutUrl.includes("demo=true")) {
-        sessionStorage.setItem("pendingAffiliateTier", tier);
-        router.push(`/affiliate/success?reference=${data.reference}&demo=true`);
-        return;
+      if (!data.checkoutUrl) {
+        throw new Error("Secure checkout is unavailable. Please try again.");
       }
 
       sessionStorage.setItem("pendingAffiliateTier", tier);

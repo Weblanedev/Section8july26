@@ -14,7 +14,6 @@ import { Skeleton } from "@/components/ui/Skeleton";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
-  const demo = searchParams.get("demo");
   const { subscribe } = useAffiliateActions();
   const userId = useAuthStore((s) => s.user?.id);
   const [done, setDone] = useState(false);
@@ -22,10 +21,10 @@ function SuccessContent() {
   useEffect(() => {
     if (!reference || done) return;
 
-    fetch(`/api/payment/verify?reference=${reference}${demo ? "&demo=true" : ""}`)
+    fetch(`/api/payment/verify?reference=${reference}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.status === "success" || data.demo) {
+        if (data.status === "success") {
           const tier = sessionStorage.getItem("pendingAffiliateTier") as AffiliateTier;
           if (tier && userId) {
             subscribe(tier);
@@ -45,7 +44,7 @@ function SuccessContent() {
           }
         }
       });
-  }, [reference, demo, subscribe, done, userId]);
+  }, [reference, subscribe, done, userId]);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-24 text-center">

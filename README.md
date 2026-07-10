@@ -8,7 +8,7 @@ A Next.js e-commerce app for Nigerian tech products with secure payments and an 
 - **Tailwind CSS** - dark modern UI
 - **Zustand** - cart, auth, affiliate state (persisted)
 - **React Hot Toast** - notifications
-- **KoraPay** - checkout redirect integration
+- Secure checkout redirect integration
 
 ## Getting Started
 
@@ -20,30 +20,26 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## KoraPay Setup
+## Payment Setup
 
-1. Create a merchant account at [Kora Dashboard](https://dashboard.korapay.com)
-2. Copy your secret key into `.env.local`:
+Add your payment secret key and public site URL to `.env.local`:
 
 ```
-KORAPAY_SECRET_KEY=sk_test_your_key
+KORAPAY_SECRET_KEY=your_secret_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Without a real key, the app runs in **demo mode** - payments simulate success locally.
+On Netlify, set the same variables in **Site settings → Environment variables**.
+Use your production URL for `NEXT_PUBLIC_APP_URL` (for example `https://sectioneight.ng`).
 
-See [KoraPay Checkout docs](https://developers.korapay.com/docs/checkout-redirect).
+Payments will not initialize until `KORAPAY_SECRET_KEY` is set.
 
 ## Features
 
-- Browse 24+ products (premium + budget tech products from at affordable prices)
-- Cart with persistent storage and Pay Now drawer
+- Browse tech products (premium + budget)
+- Cart with persistent storage
 - Sign up / Sign in (local storage, no backend DB)
-- Checkout via KoraPay (card, bank transfer, pay-with-bank)
+- Secure checkout (card, bank transfer, pay-with-bank)
 - Affiliate program with 3 tiers (Starter ₦15K, Pro ₦35K, Enterprise ₦75K)
 - Signed-in UI with distinct visual shell
 - Optional external product API route (`/api/products/external` via Fake Store API)
-
-## Legacy App
-
-The previous version lives in `/legacy` for reference.

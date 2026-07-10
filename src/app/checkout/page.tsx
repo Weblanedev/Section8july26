@@ -9,14 +9,13 @@ import { useAuthStore } from "@/store/authStore";
 import { usePersistHydration } from "@/hooks/usePersistHydration";
 import { formatNaira } from "@/lib/format";
 import { buildOrderFromCart, stashPendingOrder } from "@/lib/pendingOrder";
-import { recordOrderForUser, recordTransactionForUser } from "@/hooks/useUserAccount";
 import ProductImage from "@/components/ui/ProductImage";
 import { Spinner, SpinnerOverlay } from "@/components/ui/Spinner";
 import CheckoutSkeleton from "@/components/skeletons/CheckoutSkeleton";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice } = useCartStore();
   const { isAuthenticated, user } = useAuthStore();
   const hydrated = usePersistHydration();
   const [loading, setLoading] = useState(false);
@@ -75,33 +74,12 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      const order = buildOrderFromCart(items, data.reference, delivery.city);
-
-      const saveOrder = () => {
-        if (!user?.id) return;
-        recordOrderForUser(user.id, order);
-        recordTransactionForUser(user.id, {
-          id: `tx_${Date.now()}`,
-          type: "order",
-          amount: total,
-          status: "success",
-          reference: data.reference,
-          description: `Order - ${items.length} item(s)`,
-          createdAt: new Date().toISOString(),
-        });
-      };
-
-      // Demo mode redirects back with reference
-      if (data.checkoutUrl.includes("demo=true")) {
-        toast.success("Demo payment successful!");
-        saveOrder();
-        clearCart();
-        router.push(`/checkout/success?reference=${data.reference}&demo=true`);
-        return;
+      if (!data.checkoutUrl) {
+        throw new Error("Secure checkout is unavailable. Please try again.");
       }
 
+      const order = buildOrderFromCart(items, data.reference, delivery.city);
       stashPendingOrder(order);
-
       window.location.href = data.checkoutUrl;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Payment failed");
