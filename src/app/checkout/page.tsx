@@ -1,17 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { usePersistHydration } from "@/hooks/usePersistHydration";
 import { formatNaira } from "@/lib/format";
 import { buildOrderFromCart, stashPendingOrder } from "@/lib/pendingOrder";
+import { isNigeria } from "@/data/locations";
 import ProductImage from "@/components/ui/ProductImage";
 import { Spinner, SpinnerOverlay } from "@/components/ui/Spinner";
 import CheckoutSkeleton from "@/components/skeletons/CheckoutSkeleton";
+import DeliveryLocationFields, {
+  type DeliveryFormValues,
+} from "@/components/forms/DeliveryLocationFields";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -19,11 +23,22 @@ export default function CheckoutPage() {
   const { isAuthenticated, user } = useAuthStore();
   const hydrated = usePersistHydration();
   const [loading, setLoading] = useState(false);
-  const [delivery, setDelivery] = useState({
-    address: "",
-    city: "",
-    state: "",
-    phone: "",
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<DeliveryFormValues>({
+    defaultValues: {
+      phone: user?.phone || "",
+      address: "",
+      country: "NG",
+      state: "",
+      city: "",
+    },
   });
 
   useEffect(() => {
@@ -31,6 +46,12 @@ export default function CheckoutPage() {
       router.replace("/login?redirect=/checkout");
     }
   }, [hydrated, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (user?.phone) {
+      setValue("phone", user.phone);
+    }
+  }, [user?.phone, setValue]);
 
   if (!hydrated || !isAuthenticated) return <CheckoutSkeleton />;
 
@@ -47,15 +68,15 @@ export default function CheckoutPage() {
     );
   }
 
-  const handlePay = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!delivery.address || !delivery.city || !delivery.state || !delivery.phone) {
-      toast.error("Please fill in all delivery details");
+  const onSubmit = async (delivery: DeliveryFormValues) => {
+    if (!isNigeria(delivery.country)) {
+      toast.error("We currently deliver within Nigeria only");
       return;
     }
 
     setLoading(true);
     try {
+      const deliveryLabel = `${delivery.city}, ${delivery.state}`;
       const res = await fetch("/api/payment/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,6 +87,10 @@ export default function CheckoutPage() {
           type: "order",
           metadata: {
             items: String(items.length),
+            phone: delivery.phone,
+            address: delivery.address,
+            country: delivery.country,
+            state: delivery.state,
             city: delivery.city,
           },
         }),
@@ -78,7 +103,7 @@ export default function CheckoutPage() {
         throw new Error("Secure checkout is unavailable. Please try again.");
       }
 
-      const order = buildOrderFromCart(items, data.reference, delivery.city);
+      const order = buildOrderFromCart(items, data.reference, deliveryLabel);
       stashPendingOrder(order);
       window.location.href = data.checkoutUrl;
     } catch (err) {
@@ -121,42 +146,16 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <form onSubmit={handlePay} className="card p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="card p-6 space-y-4">
           <h2 className="text-lg font-semibold">Delivery Details</h2>
-          <input
-            type="tel"
-            placeholder="Phone number *"
-            value={delivery.phone}
-            onChange={(e) => setDelivery({ ...delivery, phone: e.target.value })}
-            className="input-field"
-            required
+
+          <DeliveryLocationFields
+            register={register}
+            control={control}
+            watch={watch}
+            setValue={setValue}
+            errors={errors}
           />
-          <input
-            type="text"
-            placeholder="Street address *"
-            value={delivery.address}
-            onChange={(e) => setDelivery({ ...delivery, address: e.target.value })}
-            className="input-field"
-            required
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="text"
-              placeholder="City *"
-              value={delivery.city}
-              onChange={(e) => setDelivery({ ...delivery, city: e.target.value })}
-              className="input-field"
-              required
-            />
-            <input
-              type="text"
-              placeholder="State *"
-              value={delivery.state}
-              onChange={(e) => setDelivery({ ...delivery, state: e.target.value })}
-              className="input-field"
-              required
-            />
-          </div>
 
           <div className="rounded-xl bg-accent/5 border border-accent/20 p-4 text-sm">
             <p className="font-medium text-accent mb-1">Secure Payment</p>

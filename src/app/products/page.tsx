@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, Suspense } from "react";
+import { useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 import DealCard from "@/components/marketplace/DealCard";
 import ProductScroller from "@/components/marketplace/ProductScroller";
 import FlashSaleBar from "@/components/marketplace/FlashSaleBar";
@@ -22,6 +23,13 @@ function ProductsContent() {
   const search = searchParams.get("search")?.toLowerCase() || "";
   const category = searchParams.get("category") || "all";
   const sort = searchParams.get("sort") || "default";
+
+  useEffect(() => {
+    if (searchParams.get("payment") === "cancelled") {
+      toast.error("Payment was not completed. Your cart is still available.");
+      window.history.replaceState({}, "", "/products");
+    }
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let result = [...productsData];

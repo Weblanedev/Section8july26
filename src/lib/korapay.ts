@@ -75,8 +75,15 @@ export async function verifyKoraPayment(reference: string) {
   const data = await response.json();
 
   if (!response.ok || !data.status) {
-    throw new Error(data.message || "Payment verification failed");
+    // Cancelled / unknown references often come back as API errors.
+    // Return a normalized failed payload so the UI can recover gracefully.
+    return {
+      reference,
+      status: "failed",
+      message: data.message || "Payment was not completed",
+    };
   }
 
   return data.data;
 }
+

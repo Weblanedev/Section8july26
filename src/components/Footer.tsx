@@ -138,14 +138,19 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-10 border-t border-gray-700 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>© 2026 Section Eight. All rights reserved.</p>
-            <p>12, Thomas Olaniyan Street, Anthony Village, Lagos</p>
-            <div className="flex gap-3">
-              <span className="rounded bg-gray-800 px-2 py-1 text-xs">Card</span>
-              <span className="rounded bg-gray-800 px-2 py-1 text-xs">Bank Transfer</span>
-              <span className="rounded bg-gray-800 px-2 py-1 text-xs">Secure Checkout</span>
+          <div className="mt-10 border-t border-gray-700 pt-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+              <p>© 2026 Section Eight. All rights reserved.</p>
+              <p>12, Thomas Olaniyan Street, Anthony Village, Lagos</p>
+              <div className="flex gap-3">
+                <span className="rounded bg-gray-800 px-2 py-1 text-xs">Card</span>
+                <span className="rounded bg-gray-800 px-2 py-1 text-xs">Bank Transfer</span>
+                <span className="rounded bg-gray-800 px-2 py-1 text-xs">Secure Checkout</span>
+              </div>
             </div>
+            <p className="mt-6 text-center text-xl font-extrabold tracking-wide text-white sm:text-2xl">
+              Powered by <span className="text-accent">Goldbook</span>
+            </p>
           </div>
         </div>
       </div>

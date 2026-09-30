@@ -8,7 +8,7 @@ import AppToaster from "@/components/AppToaster";
 import AppShell from "@/components/AppShell";
 import TopPromoBar from "@/components/marketplace/TopPromoBar";
 import CookieConsent from "@/components/CookieConsent";
-import { siteConfig } from "@/lib/site";
+import { absoluteUrl, companyContact, siteConfig } from "@/lib/site";
 import { createPageMetadata } from "@/lib/metadata";
 
 const geistSans = Geist({
@@ -48,9 +48,13 @@ export const metadata: Metadata = {
     "laptops",
     "budget tech products",
     "Section Eight",
+    "buy phones online Nigeria",
+    "laptops Lagos",
   ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "ecommerce",
   robots: {
     index: true,
     follow: true,
@@ -58,6 +62,24 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon",
     apple: "/apple-icon",
+  },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: absoluteUrl("/"),
+  logo: absoluteUrl("/icon"),
+  description: siteConfig.description,
+  email: companyContact.email,
+  telephone: companyContact.phoneTel,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "12, Thomas Olaniyan Street",
+    addressLocality: "Anthony Village",
+    addressRegion: "Lagos",
+    addressCountry: "NG",
   },
 };
 
@@ -69,6 +91,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <AppShell>
           <TopPromoBar />
           <Navbar />
