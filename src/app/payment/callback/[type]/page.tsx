@@ -16,7 +16,7 @@ import { getAffiliatePackage } from "@/data/affiliate";
 import { AffiliateTier } from "@/types";
 import { Spinner } from "@/components/ui/Spinner";
 
-type PaymentStatus = "checking" | "success" | "pending";
+type PaymentStatus = "checking" | "success";
 
 function PaymentCallbackContent() {
   const router = useRouter();
@@ -32,9 +32,7 @@ function PaymentCallbackContent() {
   const userId = useAuthStore((s) => s.user?.id);
   const { subscribe } = useAffiliateActions();
   const [status, setStatus] = useState<PaymentStatus>("checking");
-  const [message, setMessage] = useState(
-    "Please wait while we confirm your payment."
-  );
+  const [message, setMessage] = useState("Confirming your payment...");
 
   useEffect(() => {
     const goShop = () => {
@@ -51,89 +49,51 @@ function PaymentCallbackContent() {
       return;
     }
 
-    let cancelled = false;
-
-    const verify = async () => {
-      try {
-        const res = await fetch(
-          `/api/payment/verify?reference=${encodeURIComponent(reference)}`
-        );
-        const data = await res.json();
-        if (cancelled) return;
-
-        if (!res.ok) {
-          goShop();
-          return;
-        }
-
-        const paymentStatus = String(data.status || "").toLowerCase();
-
-        if (paymentStatus === "success") {
-          if (type === "affiliate") {
-            const tier = sessionStorage.getItem(
-              "pendingAffiliateTier"
-            ) as AffiliateTier | null;
-            if (tier && userId) {
-              subscribe(tier);
-              const pkg = getAffiliatePackage(tier);
-              recordTransactionForUser(userId, {
-                id: `tx_${Date.now()}`,
-                type: "affiliate",
-                amount: pkg?.price ?? 0,
-                status: "success",
-                reference,
-                description: `${pkg?.name ?? tier} affiliate subscription`,
-                createdAt: new Date().toISOString(),
-              });
-              sessionStorage.removeItem("pendingAffiliateTier");
-              toast.success("Affiliate subscription activated!");
-            }
-            setStatus("success");
-            setMessage(
-              "Welcome to the Section Eight Affiliate Program. Start earning today."
-            );
-            return;
-          }
-
-          const pending = popPendingOrder();
-          if (pending && userId) {
-            recordOrderForUser(userId, pending);
-            recordTransactionForUser(userId, {
-              id: `tx_${Date.now()}`,
-              type: "order",
-              amount: pending.total,
-              status: "success",
-              reference: pending.reference,
-              description: `Order - ${pending.items.length} item(s)`,
-              createdAt: new Date().toISOString(),
-            });
-          }
-          clearCart();
-          setStatus("success");
-          setMessage(
-            "Thank you for your order. We'll send a confirmation to your email."
-          );
-          return;
-        }
-
-        if (paymentStatus === "pending" || paymentStatus === "processing") {
-          setStatus("pending");
-          setMessage(
-            "Your payment is still processing. You can refresh this page in a moment, or check your dashboard later."
-          );
-          return;
-        }
-
-        goShop();
-      } catch {
-        if (!cancelled) goShop();
+    // Checkout Standard onSuccess is the confirmation signal — finalize locally.
+    if (type === "affiliate") {
+      const tier = sessionStorage.getItem(
+        "pendingAffiliateTier"
+      ) as AffiliateTier | null;
+      if (tier && userId) {
+        subscribe(tier);
+        const pkg = getAffiliatePackage(tier);
+        recordTransactionForUser(userId, {
+          id: `tx_${Date.now()}`,
+          type: "affiliate",
+          amount: pkg?.price ?? 0,
+          status: "success",
+          reference,
+          description: `${pkg?.name ?? tier} affiliate subscription`,
+          createdAt: new Date().toISOString(),
+        });
+        sessionStorage.removeItem("pendingAffiliateTier");
+        toast.success("Affiliate subscription activated!");
       }
-    };
+      setStatus("success");
+      setMessage(
+        "Welcome to the Section Eight Affiliate Program. Start earning today."
+      );
+      return;
+    }
 
-    verify();
-    return () => {
-      cancelled = true;
-    };
+    const pending = popPendingOrder();
+    if (pending && userId) {
+      recordOrderForUser(userId, pending);
+      recordTransactionForUser(userId, {
+        id: `tx_${Date.now()}`,
+        type: "order",
+        amount: pending.total,
+        status: "success",
+        reference: pending.reference,
+        description: `Order - ${pending.items.length} item(s)`,
+        createdAt: new Date().toISOString(),
+      });
+    }
+    clearCart();
+    setStatus("success");
+    setMessage(
+      "Thank you for your order. We'll send a confirmation to your email."
+    );
   }, [reference, type, clearCart, userId, subscribe, router]);
 
   if (status === "checking") {
@@ -143,7 +103,7 @@ function PaymentCallbackContent() {
           <div className="mx-auto mb-8 flex justify-center py-4">
             <Spinner size="xl" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Verifying Payment...</h1>
+          <h1 className="text-2xl font-bold mb-2">Confirming Payment...</h1>
           <p className="text-muted mb-4">{message}</p>
           {reference && (
             <p className="text-xs text-muted">
@@ -156,36 +116,26 @@ function PaymentCallbackContent() {
   }
 
   const title =
-    status === "success"
-      ? type === "affiliate"
-        ? "Subscription Active!"
-        : "Payment Successful!"
-      : "Payment Pending";
+    type === "affiliate" ? "Subscription Active!" : "Payment Successful!";
 
   return (
     <div className="mx-auto max-w-lg px-4 py-24 text-center">
       <div className="card p-10">
-        {status === "success" ? (
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
-            <svg
-              className="h-8 w-8 text-success"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-        ) : (
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/15">
-            <Spinner size="md" />
-          </div>
-        )}
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
+          <svg
+            className="h-8 w-8 text-success"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
 
         <h1 className="text-2xl font-bold mb-2">{title}</h1>
         <p className="text-muted mb-4">{message}</p>
@@ -197,7 +147,7 @@ function PaymentCallbackContent() {
         )}
 
         <div className="flex flex-wrap gap-3 justify-center">
-          {status === "success" && type === "order" && (
+          {type === "order" && (
             <>
               <Link href="/products" className="btn-primary">
                 Continue Shopping
@@ -207,27 +157,10 @@ function PaymentCallbackContent() {
               </Link>
             </>
           )}
-          {status === "success" && type === "affiliate" && (
+          {type === "affiliate" && (
             <Link href="/affiliate/program" className="btn-primary">
               Go to Affiliate Dashboard
             </Link>
-          )}
-          {status === "pending" && (
-            <>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => window.location.reload()}
-              >
-                Refresh status
-              </button>
-              <Link href="/dashboard" className="btn-secondary">
-                Dashboard
-              </Link>
-              <Link href="/products" className="btn-ghost text-sm">
-                Back to shop
-              </Link>
-            </>
           )}
         </div>
       </div>

@@ -8,7 +8,11 @@ import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { usePersistHydration } from "@/hooks/usePersistHydration";
 import { formatNaira } from "@/lib/format";
-import { buildOrderFromCart, stashPendingOrder } from "@/lib/pendingOrder";
+import {
+  buildOrderFromCart,
+  newOrderReference,
+  stashPendingOrder,
+} from "@/lib/pendingOrder";
 import { isNigeria } from "@/data/locations";
 import ProductImage from "@/components/ui/ProductImage";
 import { Spinner, SpinnerOverlay } from "@/components/ui/Spinner";
@@ -16,6 +20,7 @@ import CheckoutSkeleton from "@/components/skeletons/CheckoutSkeleton";
 import DeliveryLocationFields, {
   type DeliveryFormValues,
 } from "@/components/forms/DeliveryLocationFields";
+import { openKoraCheckout } from "@/lib/korapayClient";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -74,48 +79,56 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!user?.email || !user?.name) {
+      toast.error("Please sign in again to continue checkout");
+      return;
+    }
+
     setLoading(true);
     try {
+      const reference = newOrderReference();
       const deliveryLabel = `${delivery.city}, ${delivery.state}`;
-      const res = await fetch("/api/payment/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: total,
-          email: user?.email,
-          name: user?.name,
-          type: "order",
-          metadata: {
-            items: String(items.length),
-            phone: delivery.phone,
-            address: delivery.address,
-            country: delivery.country,
-            state: delivery.state,
-            city: delivery.city,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-
-      if (!data.checkoutUrl) {
-        throw new Error("Secure checkout is unavailable. Please try again.");
-      }
-
-      const order = buildOrderFromCart(items, data.reference, deliveryLabel);
+      const order = buildOrderFromCart(items, reference, deliveryLabel);
       stashPendingOrder(order);
-      window.location.href = data.checkoutUrl;
+
+      await openKoraCheckout({
+        reference,
+        amount: total,
+        customer: {
+          name: user.name,
+          email: user.email,
+        },
+        narration: "Section Eight Order Payment",
+        metadata: {
+          type: "order",
+          phone: delivery.phone,
+          state: delivery.state,
+          city: delivery.city,
+          items: String(items.length),
+        },
+        onSuccess: (result) => {
+          const paidReference = result.reference || reference;
+          router.push(
+            `/payment/callback/order?reference=${encodeURIComponent(paidReference)}`
+          );
+        },
+        onFailed: () => {
+          toast.error("Payment failed. Please try again.");
+          setLoading(false);
+        },
+        onClose: () => {
+          setLoading(false);
+        },
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Payment failed");
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      {loading && <SpinnerOverlay message="Redirecting to secure checkout..." />}
+      {loading && <SpinnerOverlay message="Opening secure checkout..." />}
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
       <div className="grid lg:grid-cols-2 gap-10">
@@ -160,7 +173,7 @@ export default function CheckoutPage() {
           <div className="rounded-xl bg-accent/5 border border-accent/20 p-4 text-sm">
             <p className="font-medium text-accent mb-1">Secure Payment</p>
             <p className="text-muted text-xs">
-              Pay with card, bank transfer, or pay-with-bank. You&apos;ll be redirected to secure checkout.
+              Pay with card, bank transfer, or pay-with-bank. Secure Kora checkout opens in a modal.
             </p>
           </div>
 
@@ -168,7 +181,7 @@ export default function CheckoutPage() {
             {loading ? (
               <span className="inline-flex items-center gap-2">
                 <Spinner size="sm" />
-                Redirecting to checkout...
+                Opening checkout...
               </span>
             ) : (
               `Pay Now - ${formatNaira(total)}`

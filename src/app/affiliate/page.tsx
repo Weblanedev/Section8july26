@@ -12,6 +12,8 @@ import { AffiliateTier } from "@/types";
 import { Spinner, SpinnerOverlay } from "@/components/ui/Spinner";
 import AffiliatePageSkeleton from "@/components/skeletons/AffiliatePageSkeleton";
 import SkeletonGate from "@/components/ui/SkeletonGate";
+import { openKoraCheckout } from "@/lib/korapayClient";
+import { generateReference } from "@/lib/format";
 
 function AffiliateContent() {
   const router = useRouter();
@@ -43,30 +45,47 @@ function AffiliateContent() {
     setSelected(tier);
     setLoading(true);
 
+    if (!user?.email || !user?.name) {
+      toast.error("Please sign in again to continue");
+      setLoading(false);
+      setSelected(null);
+      return;
+    }
+
     try {
-      const res = await fetch("/api/payment/initialize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: pkg.price,
-          email: user?.email,
-          name: user?.name,
-          type: "affiliate",
-          metadata: { tier },
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      if (!data.checkoutUrl) {
-        throw new Error("Secure checkout is unavailable. Please try again.");
-      }
-
+      const reference = generateReference("AFF");
       sessionStorage.setItem("pendingAffiliateTier", tier);
-      window.location.href = data.checkoutUrl;
+
+      await openKoraCheckout({
+        reference,
+        amount: pkg.price,
+        customer: {
+          name: user.name,
+          email: user.email,
+        },
+        narration: "Section Eight Affiliate Subscription",
+        metadata: {
+          type: "affiliate",
+          tier,
+        },
+        onSuccess: (result) => {
+          const paidReference = result.reference || reference;
+          router.push(
+            `/payment/callback/affiliate?reference=${encodeURIComponent(paidReference)}`
+          );
+        },
+        onFailed: () => {
+          toast.error("Payment failed. Please try again.");
+          setLoading(false);
+          setSelected(null);
+        },
+        onClose: () => {
+          setLoading(false);
+          setSelected(null);
+        },
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Payment failed");
-    } finally {
       setLoading(false);
       setSelected(null);
     }
@@ -74,7 +93,7 @@ function AffiliateContent() {
 
   return (
     <div>
-      {loading && <SpinnerOverlay message="Processing subscription..." />}
+      {loading && <SpinnerOverlay message="Opening secure checkout..." />}
       {/* Hero */}
       <section className="px-4 py-20 text-center mesh-bg">
         <div className="mx-auto max-w-3xl">
